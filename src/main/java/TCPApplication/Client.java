@@ -15,6 +15,7 @@ public class Client {
     private BufferedReader in;
 
     private Scanner scanner = new Scanner(System.in);
+    private boolean isEnd = false;
 
     public Client(String ip, int port) throws IOException {
         socket = new Socket(ip, port);
@@ -22,29 +23,41 @@ public class Client {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    public void start() throws IOException {
-        boolean isEnd;
-        System.out.println("Напишите первое сообщение");
-        out.println("Client: " + scanner.nextLine());
+    public void start() throws IOException, InterruptedException {
+        Thread tread = new Thread(() -> {
+            String message;
+            while (!this.isEnd){
+            try {
+                message = in.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (message != null) {
+                System.out.println(message);
+            }
+            }
+        });
+        tread.start();
         do {
-            isEnd = managerActions();
-        } while (isEnd);
+            this.isEnd = managerActions();
+        } while (!this.isEnd);
         stop();
+        tread.join();
     }
     private boolean managerActions() throws IOException {
-
+        /*
         var message = in.readLine();
 
         if (message != null) {
             System.out.println(message);
         }
-
+        */
         if (scanner.hasNextLine()){
             String yourAnswer = "Client: " + scanner.nextLine();
             out.println(yourAnswer);
-            return !yourAnswer.equals("Client: Good bye");
+            return yourAnswer.equals("Client: Good bye");
         }
-        return true;
+        return false;
     }
 
     public void stop() throws IOException {
@@ -54,7 +67,7 @@ public class Client {
         scanner.close();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Client client = new Client("127.0.0.1", 5000);
         client.start();
     }

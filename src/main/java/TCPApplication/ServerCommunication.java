@@ -13,6 +13,7 @@ public class ServerCommunication {
     private BufferedReader in;
 
     private Scanner scanner = new Scanner(System.in);
+    private boolean isEnd = false;
 
 
     public ServerCommunication(int port) throws IOException {
@@ -22,26 +23,44 @@ public class ServerCommunication {
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     }
 
-    public void start() throws IOException {
-        boolean isEnd;
+    public void start() throws IOException, InterruptedException {
+
+        Thread tread = new Thread(() -> {
+            String message;
+            while (!this.isEnd) {
+                try {
+                    message = in.readLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if (message != null) {
+                    System.out.println(message);
+                }
+            }
+        });
+        tread.start();
         do {
-            isEnd = managerActions();
-        } while (isEnd);
+            this.isEnd = managerActions();
+        } while (!this.isEnd);
         stop();
+        tread.join();
     }
 
     private boolean managerActions() throws IOException {
+        /*
         var message = in.readLine();
 
         if (message != null) {
             System.out.println(message);
         }
+        */
+
         if (scanner.hasNextLine()){
             String yourAnswer = "Server: " + scanner.nextLine();
             out.println(yourAnswer);
-            return !yourAnswer.equals("Server: Good bye");
+            return yourAnswer.equals("Server: Good bye");
         }
-        return true;
+        return false;
     }
 
     public void stop() throws IOException {
@@ -52,7 +71,7 @@ public class ServerCommunication {
         scanner.close();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         ServerCommunication server = new ServerCommunication(5000);
         server.start();
     }
