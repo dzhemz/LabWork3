@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class Client2 {
 
     private Socket socket;
 
@@ -17,7 +17,7 @@ public class Client {
     private Scanner scanner = new Scanner(System.in);
     private boolean isEnd = false;
 
-    public Client(String ip, int port) throws IOException {
+    public Client2(String ip, int port) throws IOException {
         socket = new Socket(ip, port);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -43,12 +43,14 @@ public class Client {
         } while (!this.isEnd);
         tread.join();
         stop();
+
     }
     private boolean managerActions() throws IOException {
+
         if (scanner.hasNextLine()){
-            String yourAnswer = "Client: " + scanner.nextLine();
+            String yourAnswer = "Client2: " + scanner.nextLine();
             out.println(yourAnswer);
-            return yourAnswer.equals("Client: Good bye");
+            return yourAnswer.equals("Client2: Good bye");
         }
         return false;
     }
@@ -61,7 +63,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Client client = new Client("127.0.0.1", 5000);
-        client.start();
+        Client2 Client2 = new Client2("127.0.0.1", 5000);
+        Client2.start();
     }
 }

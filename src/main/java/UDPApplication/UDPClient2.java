@@ -1,21 +1,24 @@
 package UDPApplication;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Scanner;
 
-public class UDPServer {
+public class UDPClient2 {
     private DatagramSocket datagramSocket;
     private Scanner scanner = new Scanner(System.in);
-
 
     private byte[] buffer = new byte[256];
 
     private int sendTo;
     boolean isEnd = false;
 
-    public UDPServer(int port, int sendTo){
+    public UDPClient2(int port, int sendTo){
         this.sendTo = sendTo;
         try {
             datagramSocket = new DatagramSocket(port);
@@ -33,7 +36,6 @@ public class UDPServer {
                 packet = new DatagramPacket(buffer, buffer.length);
                 try {
                     datagramSocket.receive(packet);
-
                     var answer = packet.getData();
                     StringBuilder stringBuffer = new StringBuilder();
                     for (byte character:
@@ -46,12 +48,13 @@ public class UDPServer {
                 }
             }
         });
+
         thread.start();
         do {
             isEnd = manageActions();
         }while (!isEnd);
-        stop();
         thread.join();
+        stop();
     }
 
 
@@ -59,12 +62,11 @@ public class UDPServer {
 
         String message;
         if ((message = scanner.nextLine()) != null){
+            message = message;
             DatagramPacket packet;
             try {
                 packet = new DatagramPacket(message.getBytes(StandardCharsets.UTF_8),
-                        0, message.getBytes(StandardCharsets.UTF_8).length,
-                        InetAddress.getByName("localhost"),
-                        sendTo);
+                        0, message.getBytes(StandardCharsets.UTF_8).length, InetAddress.getByName("localhost"), sendTo);
                 datagramSocket.send(packet);
             } catch (IOException ignored){}
             return "good bye".equals(message);
@@ -79,8 +81,8 @@ public class UDPServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        var udpServer = new UDPServer(5000, 5001);
+        var udpServer = new UDPClient2(5002, 5000);
         udpServer.start();
     }
-
 }
+

@@ -42,19 +42,11 @@ public class ServerCommunication {
         do {
             this.isEnd = managerActions();
         } while (!this.isEnd);
-        stop();
         tread.join();
+        stop();
     }
 
     private boolean managerActions() throws IOException {
-        /*
-        var message = in.readLine();
-
-        if (message != null) {
-            System.out.println(message);
-        }
-        */
-
         if (scanner.hasNextLine()){
             String yourAnswer = "Server: " + scanner.nextLine();
             out.println(yourAnswer);
